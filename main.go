@@ -29,12 +29,11 @@ func main() {
 
 	dg.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if i.ApplicationCommandData().Name == "ping" {
-			latency := time.Since(i.Interaction.Message.Timestamp)
 			apiLatency := s.HeartbeatLatency()
 			err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: fmt.Sprintf("Latency is %dms. API Latency is %dms", latency.Milliseconds(), apiLatency.Milliseconds()),
+					Content: fmt.Sprintf("API Latency is %dms", apiLatency.Milliseconds()),
 				},
 			})
 			if err != nil {
