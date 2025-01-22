@@ -1,4 +1,5 @@
 [![Discord](https://img.shields.io/discord/1312381782942810192?logo=discord&labelColor=white&label=Discord)](https://discord.gg/4sRmgb9Vph)
+[![build-and-test](https://github.com/qbaware/qbaware-discord-bot/actions/workflows/build-and-test.yml/badge.svg?branch=main)](https://github.com/qbaware/qbaware-discord-bot/actions/workflows/build-and-test.yml)
 
 ---
 
