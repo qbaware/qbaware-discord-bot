@@ -1,10 +1,10 @@
-package main
+package discord
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -54,47 +54,52 @@ var (
 	}
 )
 
-func main() {
-	// Extract the API token from the environment.
-	token := os.Getenv("DISCORD_BOT_TOKEN")
-	if token == "" {
-		log.Fatal("Invalid token. Please set the DISCORD_BOT_TOKEN environment variable.")
-	}
+// Connection represents a websocket connection to the Discord API.
+type Connection struct {
+	s *discordgo.Session
+}
 
+// NewConnection creates a new Discord connection.
+func NewConnection(token string) *Connection {
+	// Create the bot.
+	dg, _ := discordgo.New("Bot " + token)
+
+	return &Connection{
+		s: dg,
+	}
+}
+
+// Init initializes the Discord connection and the Discord bot.
+func (d *Connection) Init() error {
 	// Check for connectivity to the Discord APIs.
 	resp, err := http.Get("https://discord.com/api/v9/invites/discord-developers")
 	if err != nil || resp.StatusCode != http.StatusOK {
-		log.Fatal("Uh oh, looks like this node is currently being blocked by Discord")
+		return errors.New("blocked by Discord")
 	}
 	resp.Body.Close()
 
-	// Create the bot.
-	dg, err := discordgo.New("Bot " + token)
-	if err != nil {
-		log.Fatal("Error creating Discord session: ", err)
-	}
-
 	// Register handlers for the supported bot commands.
-	dg.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	d.s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if handler, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
 			handler(s, i)
 		}
 	})
 
 	// Create a websocket connection with Discord's servers.
-	err = dg.Open()
+	err = d.s.Open()
 	if err != nil {
-		log.Fatal("Error opening Discord session: ", err)
+		return errors.New("error opening Discord session: " + err.Error())
 	}
 
 	// Register supported commands with Discord's servers.
 	for _, cmd := range commands {
-		_, err := dg.ApplicationCommandCreate(dg.State.User.ID, "", cmd)
+		_, err := d.s.ApplicationCommandCreate(d.s.State.User.ID, "", cmd)
 		if err != nil {
-			log.Fatalf("Cannot create '%s' command: %v", cmd.Name, err)
+			return errors.New("error creating command: " + err.Error())
 		}
 	}
 
 	log.Println("Bot is now running...")
-	select {}
+
+	return nil
 }
