@@ -12,7 +12,10 @@ import (
 
 // GitHub release webhook payload.
 type GitHubReleaseEvent struct {
-	Action  string `json:"action"`
+	Action     string `json:"action"`
+	Repository struct {
+		FullName string `json:"full_name"`
+	} `json:"repository"`
 	Release struct {
 		TagName string `json:"tag_name"`
 		Name    string `json:"name"`
@@ -35,7 +38,7 @@ func verifySignature(payload []byte, signature string, secret string) bool {
 }
 
 // HandleNewReleaseWebhook handles the GitHub webhook for new releases.
-func HandleNewReleaseWebhook(w http.ResponseWriter, r *http.Request, webhookSecret string, sendNotification func(releaseName string, releaseVersion string, releaseURL string, releaseBody string)) {
+func HandleNewReleaseWebhook(w http.ResponseWriter, r *http.Request, webhookSecret string, sendNotification func(repoFullName string, releaseName string, releaseVersion string, releaseURL string, releaseBody string)) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -74,12 +77,13 @@ func HandleNewReleaseWebhook(w http.ResponseWriter, r *http.Request, webhookSecr
 		return
 	}
 
+	releaseRepo := event.Repository.FullName
 	releaseName := event.Release.Name
 	releaseVersion := event.Release.TagName
 	releaseURL := event.Release.HTMLURL
 	releaseBody := event.Release.Body
 
-	sendNotification(releaseName, releaseVersion, releaseURL, releaseBody)
+	sendNotification(releaseRepo, releaseName, releaseVersion, releaseURL, releaseBody)
 
 	w.WriteHeader(http.StatusOK)
 }

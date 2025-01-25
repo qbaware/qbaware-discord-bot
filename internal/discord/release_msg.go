@@ -6,8 +6,13 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-// SendNewReleaseNotification sends a new release notification to the specified Discord channel.
-func (d *Connection) SendNewReleaseNotification(releaseNotificationChannel string, releaseName string, releaseVersion string, releaseURL string, releaseBody string) error {
+// SendNewReleaseNotification sends a new release notification to a Discord channel that matches the given repository name.
+func (d *Connection) SendNewReleaseNotification(repoFullName string, releaseName string, releaseVersion string, releaseURL string, releaseBody string) error {
+	channelID, ok := ChannelMapping[repoFullName]
+	if !ok {
+		return errors.New("no channel mapping found for repository: " + repoFullName)
+	}
+
 	embed := &discordgo.MessageEmbed{
 		Title:       "New Release: " + releaseName,
 		Description: releaseBody,
@@ -22,7 +27,7 @@ func (d *Connection) SendNewReleaseNotification(releaseNotificationChannel strin
 		},
 	}
 
-	_, err := d.s.ChannelMessageSendEmbed(releaseNotificationChannel, embed)
+	_, err := d.s.ChannelMessageSendEmbed(channelID, embed)
 	if err != nil {
 		return errors.New("error sending release notification: " + err.Error())
 	}

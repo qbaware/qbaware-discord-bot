@@ -14,10 +14,6 @@ func main() {
 	if token == "" {
 		log.Fatal("Please set the DISCORD_BOT_TOKEN environment variable")
 	}
-	releaseChannelID := os.Getenv("DISCORD_CHANNEL_ID")
-	if releaseChannelID == "" {
-		log.Fatal("Please set the DISCORD_CHANNEL_ID environment variable")
-	}
 	webhookSecret := os.Getenv("GITHUB_WEBHOOK_SECRET")
 	if webhookSecret == "" {
 		log.Fatal("Please set the GITHUB_WEBHOOK_SECRET environment variable")
@@ -33,8 +29,8 @@ func main() {
 
 	// Add GitHub webhook HTTP server.
 	http.HandleFunc("/gh-webhook", func(w http.ResponseWriter, r *http.Request) {
-		gh.HandleNewReleaseWebhook(w, r, webhookSecret, func(releaseName string, releaseVersion string, releaseURL string, releaseBody string) {
-			err := dc.SendNewReleaseNotification(releaseChannelID, releaseName, releaseVersion, releaseURL, releaseBody)
+		gh.HandleNewReleaseWebhook(w, r, webhookSecret, func(repoFullName string, releaseName string, releaseVersion string, releaseURL string, releaseBody string) {
+			err := dc.SendNewReleaseNotification(repoFullName, releaseName, releaseVersion, releaseURL, releaseBody)
 			if err != nil {
 				log.Printf("Error sending release notification: %s", err.Error())
 			}
