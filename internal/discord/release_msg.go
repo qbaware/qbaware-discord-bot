@@ -14,7 +14,7 @@ func (d *Connection) SendNewReleaseNotification(repoFullName string, releaseName
 	}
 
 	embed := &discordgo.MessageEmbed{
-		Title:       "New Release :tada:",
+		Title:       "New Release! :rocket:",
 		Description: releaseBody,
 		URL:         releaseURL,
 		Color:       0x00ff00, // Green color
