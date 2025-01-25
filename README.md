@@ -7,7 +7,7 @@
 
 The bot supports two main features:
 1. *Commands* via which people can interact with it.
-2. Sending messages to Qbaware's Discord channel when there's a new release in [qbaware/homeassistant-eldom](https://github.com/qbaware/homeassistant-eldom).
+2. Sending messages to Qbaware's Discord channel when there's a new release in multiple Qbaware repositories.
 
 ## Commands
 
