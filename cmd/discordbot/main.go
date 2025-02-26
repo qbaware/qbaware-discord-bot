@@ -4,8 +4,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+
 	"qbaware-discord-bot/internal/discord"
-	"qbaware-discord-bot/internal/gh"
+	"qbaware-discord-bot/internal/github"
 )
 
 func main() {
@@ -28,14 +29,21 @@ func main() {
 	log.Println("Discord connection initialized successfully")
 
 	// Add GitHub webhook HTTP server.
-	http.HandleFunc("/gh-webhook", func(w http.ResponseWriter, r *http.Request) {
-		gh.HandleNewReleaseWebhook(w, r, webhookSecret, func(repoFullName string, releaseName string, releaseVersion string, releaseURL string, releaseBody string) {
-			err := dc.SendNewReleaseNotification(repoFullName, releaseName, releaseVersion, releaseURL, releaseBody)
-			if err != nil {
-				log.Printf("Error sending release notification: %s", err.Error())
-			}
-		})
+	ghReleaseNotificationHandler := github.NewReleaseWebhookHandler([]func(github.RepoReleaseDetails){
+		func(rrd github.RepoReleaseDetails) {
+			dc.SendNewReleaseNotification(rrd.Repo, rrd.Name, rrd.Version, rrd.URL, rrd.Body)
+		},
 	})
+	ghStarNotificationHandler := github.NewStarWebhookHandler([]func(github.RepoStarDetails){
+		func(rsd github.RepoStarDetails) {
+			dc.SendNewStarNotification(rsd.Repo, rsd.RepoURL, rsd.StarringUser, rsd.TotalStars)
+		},
+	})
+	ghWebhookHandlers := []github.WebhookHandler{
+		ghReleaseNotificationHandler,
+		ghStarNotificationHandler,
+	}
+	http.HandleFunc("/gh-webhook", github.NewWebhookHandler(webhookSecret, ghWebhookHandlers))
 
 	// Start HTTP server on the main thread.
 	log.Println("Starting GitHub webhook server on :8080...")
