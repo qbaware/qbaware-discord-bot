@@ -19,9 +19,9 @@ type StarEvent struct {
 	StarredAt  string `json:"starred_at"`
 	Repository struct {
 		FullName string `json:"full_name"`
+		Stars    string `json:"stargazers_count"`
 	} `json:"repository"`
 	URL    string `json:"html_url"`
-	Stars  string `json:"stargazers_count"`
 	Sender struct {
 		Login string `json:"login"`
 	} `json:"sender"`
@@ -62,7 +62,7 @@ func (r StarWebhookHandler) Handle(payload []byte) {
 			Repo:         event.Repository.FullName,
 			RepoURL:      event.URL,
 			StarringUser: event.Sender.Login,
-			TotalStars:   event.Stars,
+			TotalStars:   event.Repository.Stars,
 		})
 	}
 }
