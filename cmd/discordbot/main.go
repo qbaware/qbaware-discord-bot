@@ -9,6 +9,10 @@ import (
 	"qbaware-discord-bot/internal/github"
 )
 
+const (
+	defaultPort = "5600"
+)
+
 func main() {
 	// Extract envornment variables.
 	token := os.Getenv("DISCORD_BOT_TOKEN")
@@ -18,6 +22,10 @@ func main() {
 	webhookSecret := os.Getenv("GITHUB_WEBHOOK_SECRET")
 	if webhookSecret == "" {
 		log.Fatal("Please set the GITHUB_WEBHOOK_SECRET environment variable")
+	}
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = defaultPort
 	}
 
 	// Initialize the Discord connection.
@@ -46,8 +54,8 @@ func main() {
 	http.HandleFunc("/gh-webhook", github.NewWebhookHandler(webhookSecret, ghWebhookHandlers))
 
 	// Start HTTP server on the main thread.
-	log.Println("Starting GitHub webhook server on :8080...")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	log.Println("Starting GitHub webhook server on :" + port + "...")
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatal("Error starting HTTP server: ", err)
 	}
 }
