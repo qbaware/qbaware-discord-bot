@@ -16,6 +16,7 @@ type RepoStarDetails struct {
 // GitHub star webhook payload.
 type StarEvent struct {
 	Action     string `json:"action"`
+	StarredAt  string `json:"starred_at"`
 	Repository struct {
 		FullName string `json:"full_name"`
 	} `json:"repository"`
@@ -48,6 +49,11 @@ func (r StarWebhookHandler) Handle(payload []byte) {
 	var event StarEvent
 	if err := json.Unmarshal(payload, &event); err != nil {
 		log.Printf("Error unmarshalling GitHub star event: %v", err)
+		return
+	}
+
+	if event.Action != "created" {
+		log.Panicf("Unsupported GitHub star event action: %s", event.Action)
 		return
 	}
 

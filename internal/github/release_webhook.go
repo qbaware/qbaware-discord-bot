@@ -55,7 +55,7 @@ func (r ReleaseWebhookHandler) Handle(payload []byte) {
 
 	// Only process "published" release events.
 	if event.Action != "published" {
-		log.Panicf("Unsupported GitHub release action: %s", event.Action)
+		log.Printf("Unsupported GitHub release action: %s, skipping processing", event.Action)
 		return
 	}
 
