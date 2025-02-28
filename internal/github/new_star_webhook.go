@@ -2,6 +2,7 @@ package github
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 )
 
@@ -19,7 +20,7 @@ type StarEvent struct {
 	StarredAt  string `json:"starred_at"`
 	Repository struct {
 		FullName string `json:"full_name"`
-		Stars    string `json:"stargazers_count"`
+		Stars    int    `json:"stargazers_count"`
 	} `json:"repository"`
 	URL    string `json:"html_url"`
 	Sender struct {
@@ -62,7 +63,7 @@ func (r StarWebhookHandler) Handle(payload []byte) {
 			Repo:         event.Repository.FullName,
 			RepoURL:      event.URL,
 			StarringUser: event.Sender.Login,
-			TotalStars:   event.Repository.Stars,
+			TotalStars:   fmt.Sprintf("%d", event.Repository.Stars),
 		})
 	}
 }
