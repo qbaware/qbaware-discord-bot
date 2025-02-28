@@ -29,3 +29,4 @@ jobs:
       with:
         context: "."
         push: true
+        tags: ghcr.io/qbaware/qbaware-discord-bot:latest
