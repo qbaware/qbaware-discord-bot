@@ -55,7 +55,7 @@ func main() {
 
 	// Start HTTP server on the main thread.
 	log.Println("Starting GitHub webhook server on :" + port + "...")
-	if err := http.ListenAndServe("localhost:"+port, nil); err != nil {
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatal("Error starting HTTP server: ", err)
 	}
 }
