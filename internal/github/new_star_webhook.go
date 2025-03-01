@@ -54,7 +54,7 @@ func (r StarWebhookHandler) Handle(payload []byte) {
 	}
 
 	if event.Action != "created" {
-		log.Panicf("Unsupported GitHub star event action: %s", event.Action)
+		log.Printf("Unsupported GitHub star event action: %s, skipping its processing (repo: %s, username: %s)", event.Action, event.Repository.FullName, event.Sender.Login)
 		return
 	}
 
@@ -66,4 +66,5 @@ func (r StarWebhookHandler) Handle(payload []byte) {
 			TotalStars:   fmt.Sprintf("%d", event.Repository.Stars),
 		})
 	}
+	log.Printf("Processed GitHub star event for repo %s from user: %s", event.Repository.FullName, event.Sender.Login)
 }
