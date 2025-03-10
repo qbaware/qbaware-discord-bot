@@ -73,7 +73,7 @@ func NewConnection(token string) *Connection {
 func (d *Connection) Init() error {
 	// Check for connectivity to the Discord APIs.
 	resp, err := http.Get("https://discord.com/api/v9/invites/discord-developers")
-	if err != nil || resp.StatusCode != http.StatusOK {
+	if err != nil || resp == nil || resp.StatusCode != http.StatusOK {
 		return errors.New("blocked by Discord")
 	}
 	resp.Body.Close()
